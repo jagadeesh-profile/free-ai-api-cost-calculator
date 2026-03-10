@@ -1,0 +1,11 @@
+# Ignore Docker/Node artifacts
+node_modules/
+api-calculator.tar
+test.js
+test_output.txt
+k8s-output.txt
+*.tar
+
+# OS files
+.DS_Store
+Thumbs.db
