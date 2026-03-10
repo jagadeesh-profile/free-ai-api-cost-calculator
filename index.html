@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Primary SEO Meta Tags -->
+    <title>Free AI API Cost Calculator 2026 | OpenAI, Claude, Gemini Pricing</title>
+    <meta name="title" content="Free AI API Cost Calculator 2026 | OpenAI, Claude, Gemini Pricing">
+    <meta name="description" content="Free AI API cost calculator for OpenAI GPT-5, Claude 4, Gemini 3, Grok-2 and more. Estimate, compare and optimize your AI API costs with PDF export. Updated 2026 pricing.">
+    <meta name="keywords" content="free AI API cost calculator, OpenAI pricing calculator, Claude API cost, Gemini API pricing, GPT-5 cost, AI API comparison, ChatGPT API price, AI cost estimator, LLM pricing tool, AI token cost calculator, API cost optimizer">
+    <meta name="author" content="Jagadeesh Pamidi">
+    <meta name="robots" content="index, follow">
+    <meta name="revisit-after" content="7 days">
+
+    <!-- Canonical URL (update after GitHub Pages is live) -->
+    <link rel="canonical" href="https://jagadeeshpamidi.github.io/free-ai-api-cost-calculator/">
+
+    <!-- Favicon -->
+    <link rel="icon" href="robot-icon.png" type="image/png">
+    <link rel="apple-touch-icon" href="robot-icon.png">
+
+    <!-- Preload critical resources -->
+    <link rel="preload" href="styles.css?v=3" as="style">
+    <link rel="preload" href="app-v2.js?v=3" as="script">
+
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="styles.css?v=3">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://jagadeeshpamidi.github.io/free-ai-api-cost-calculator/">
+    <meta property="og:title" content="Free AI API Cost Calculator 2026 | Compare All Providers">
+    <meta property="og:description" content="Calculate and compare AI API costs for OpenAI, Claude, Gemini, Grok and 10+ providers. Free tool updated with 2026 pricing.">
+    <meta property="og:image" content="https://jagadeeshpamidi.github.io/free-ai-api-cost-calculator/robot-icon.png">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Free AI API Cost Calculator 2026">
+    <meta name="twitter:description" content="Calculate and compare AI API costs for GPT-5, Claude 4, Gemini 3, Grok-2 and more. Free, no signup required.">
+    <meta name="twitter:image" content="https://jagadeeshpamidi.github.io/free-ai-api-cost-calculator/robot-icon.png">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- JSON-LD Structured Data for Google Rich Results -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Free AI API Cost Calculator",
+      "description": "Calculate and compare AI API costs for OpenAI, Anthropic Claude, Google Gemini, xAI Grok and more. Free tool with 2026 pricing data.",
+      "url": "https://jagadeeshpamidi.github.io/free-ai-api-cost-calculator/",
+      "applicationCategory": "BusinessApplication",
+      "operatingSystem": "Any",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+      "author": { "@type": "Person", "name": "Jagadeesh Pamidi", "email": "jagadeeshpamidi03@gmail.com" }
+    }
+    </script>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo-container">
+                <h1>
+                    <img src="robot-icon.png" alt="AI Robot" style="width: 32px; height: 32px; border-radius: 50%; vertical-align: middle; border: 2px solid white;">
+                    <span style="font-size: 1.3em;">F</span>ree AI API Cost Calculator
+                </h1>
+            </div>
+            <p>Calculate costs for OpenAI, Claude, Gemini & More</p>
+            <span class="badge">✨ Export PDF/CSV • Share Links • Save Calculations</span>
+        </div>
+
+        <div class="action-bar">
+            <button class="btn btn-primary" onclick="saveCalculation()">💾 Save</button>
+            <button class="btn btn-primary" onclick="shareCalculation()">🔗 Share</button>
+            <button class="btn btn-success" onclick="exportPDF()">📄 PDF</button>
+            <button class="btn btn-info" onclick="exportCSV()">📊 CSV</button>
+            <button class="btn btn-warning" onclick="loadSaved()">📂 Saved</button>
+        </div>
+
+        <div class="calculator-grid">
+            <!-- Configuration Card -->
+            <div class="card col-4">
+                <h2><span class="icon">⚙️</span> Configuration</h2>
+
+                <div class="form-group">
+                    <label>AI Provider</label>
+                    <select id="provider" onchange="app.updateModels()">
+                        <option value="openai">OpenAI (ChatGPT)</option>
+                        <option value="anthropic">Anthropic (Claude)</option>
+                        <option value="google">Google (Gemini)</option>
+                        <option value="mistral">Mistral AI</option>
+                        <option value="cohere">Cohere</option>
+                        <option value="meta">Meta (Llama 3)</option>
+                        <option value="xai">xAI (Grok)</option>
+                        <option value="perplexity">Perplexity</option>
+                        <option value="together">Together AI</option>
+                        <option value="groq">Groq</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Model</label>
+                    <select id="model" onchange="app.calculate()"></select>
+                    <div id="modelInfo" class="model-info"></div>
+                </div>
+
+                <div class="form-group">
+                    <label>Usage Period (Start & End Date)</label>
+                    <div style="display: flex; gap: 10px;">
+                        <input type="date" id="startDate" onchange="app.calculatePeriod()" style="flex: 1" title="Start Date">
+                        <input type="date" id="endDate" onchange="app.calculatePeriod()" style="flex: 1" title="End Date">
+                    </div>
+                    <div id="daysCount" style="margin-top: 8px; font-size: 13px; color: var(--primary); font-weight: 600;">
+                        1 day selected
+                    </div>
+                </div>
+            </div>
+
+            <!-- Usage Card -->
+            <div class="card col-4">
+                <h2><span class="icon">📊</span> Usage Estimates</h2>
+
+                <div class="form-group">
+                    <label>Quick Presets</label>
+                    <div class="preset-chips">
+                        <span class="chip" onclick="app.preset('chatbot')">💬 Chatbot</span>
+                        <span class="chip" onclick="app.preset('content')">✍️ Content</span>
+                        <span class="chip" onclick="app.preset('support')">🎧 Support</span>
+                        <span class="chip" onclick="app.preset('code')">💻 Code</span>
+                    </div>
+                </div>
+
+                <div class="slider-container">
+                    <div class="slider-header">
+                        <label>Number of Requests</label>
+                        <span id="reqValue" class="slider-value">1,000</span>
+                    </div>
+                    <input type="range" id="requests" class="slider" min="1" max="100000" value="1000" step="100"
+                        oninput="app.calculate()">
+                </div>
+
+                <div class="slider-container">
+                    <div class="slider-header">
+                        <label>Input Tokens per Request</label>
+                        <span id="inValue" class="slider-value">500</span>
+                    </div>
+                    <input type="range" id="inputTokens" class="slider" min="10" max="8000" value="500" step="10"
+                        oninput="app.calculate()">
+                </div>
+
+                <div class="slider-container">
+                    <div class="slider-header">
+                        <label>Output Tokens per Request</label>
+                        <span id="outValue" class="slider-value">300</span>
+                    </div>
+                    <input type="range" id="outputTokens" class="slider" min="10" max="8000" value="300" step="10"
+                        oninput="app.calculate()">
+                </div>
+
+                <div class="form-group">
+                    <label style="display: flex; align-items: center; gap: 8px;">
+                        <input type="checkbox" id="cache" onchange="app.calculate()" style="width: auto;">
+                        <span>Use Prompt Caching (Save 80-90%)</span>
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label style="display: flex; align-items: center; gap: 8px;">
+                        <input type="checkbox" id="batch" onchange="app.calculate()" style="width: auto;">
+                        <span>Use Batch API (50% Discount)</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Advanced Settings -->
+            <div class="card col-4">
+                <h2><span class="icon">🎯</span> Advanced Settings</h2>
+
+                <div class="form-group">
+                    <label>Monthly Growth Rate (%)</label>
+                    <input type="number" id="growth" value="10" min="0" max="500" onchange="app.calculate()">
+                </div>
+
+                <div class="form-group">
+                    <label>Volume Discount (%)</label>
+                    <input type="number" id="discount" value="0" min="0" max="50" onchange="app.calculate()">
+                </div>
+
+                <div class="form-group">
+                    <label>Enterprise Plan</label>
+                    <select id="enterprise" onchange="app.calculate()">
+                        <option value="0">None</option>
+                        <option value="5">Standard (5% off)</option>
+                        <option value="10">Plus (10% off)</option>
+                        <option value="15">Premium (15% off)</option>
+                        <option value="20">Enterprise (20% off)</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Results Dashboard -->
+            <div class="card col-12">
+                <h2><span class="icon">💰</span> Cost Analysis</h2>
+
+                <div class="results-grid">
+                    <div class="result-box">
+                        <div class="result-label">Total Cost</div>
+                        <div class="result-value" id="totalCost">$0.00</div>
+                        <div class="result-subtext" id="period">per day</div>
+                    </div>
+
+                    <div class="result-box" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                        <div class="result-label">Input Cost</div>
+                        <div class="result-value" id="inputCost">$0.00</div>
+                        <div class="result-subtext">prompts</div>
+                    </div>
+
+                    <div class="result-box" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                        <div class="result-label">Output Cost</div>
+                        <div class="result-value" id="outputCost">$0.00</div>
+                        <div class="result-subtext">completions</div>
+                    </div>
+
+                    <div class="result-box" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+                        <div class="result-label">Per Request</div>
+                        <div class="result-value" id="perRequest">$0.000</div>
+                        <div class="result-subtext">average cost</div>
+                    </div>
+
+                    <div class="result-box" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
+                        <div class="result-label">Monthly</div>
+                        <div class="result-value" id="monthly">$0.00</div>
+                        <div class="result-subtext">projected</div>
+                    </div>
+
+                    <div class="result-box" style="background: linear-gradient(135deg, #30cfd0 0%, #330867 100%);">
+                        <div class="result-label">Yearly</div>
+                        <div class="result-value" id="yearly">$0.00</div>
+                        <div class="result-subtext">projected</div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 30px;">
+                    <h3 style="margin-bottom: 15px;">12-Month Cost Projection</h3>
+                    <canvas id="chart" style="max-height: 300px;"></canvas>
+                </div>
+            </div>
+
+            <!-- Clear Insights & Optimization -->
+            <div class="card col-12" id="insightsCard">
+                <h2><span class="icon">💡</span> Clear Insights & Optimization</h2>
+                
+                <div class="insights-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 20px;">
+                    <!-- Cost Distribution Chart -->
+                    <div>
+                        <h3 style="margin-bottom: 15px; font-size: 16px; color: #444;">Cost Distribution (Input vs Output)</h3>
+                        <div style="position: relative; height: 250px;">
+                            <canvas id="distributionChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Optimization Suggestions -->
+                    <div class="optimization-box" style="background: #f8f9fa; padding: 25px; border-radius: 12px; border-left: 4px solid var(--primary);">
+                        <h3 style="margin-bottom: 15px; font-size: 16px; color: #4facfe;">Optimization Opportunities</h3>
+                        <div id="optimizationContent">
+                            <p style="color: #666; font-size: 14px;">Select a provider and model to see potential savings.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Comparison Table -->
+            <div class="card col-12" id="comparisonCard" style="transition: all 0.5s ease;">
+                <h2><span class="icon">📊</span> Provider Comparison</h2>
+                <p style="color: #666; margin-bottom: 15px; font-size: 14px;">
+                    Showing top 10 most cost-effective options based on your settings
+                </p>
+
+                <div style="overflow-x: auto;">
+                    <table id="comparison">
+                        <thead>
+                            <tr>
+                                <th>Provider</th>
+                                <th>Model</th>
+                                <th>Cost/Request</th>
+                                <th>Daily</th>
+                                <th>Monthly</th>
+                                <th>Potential Savings</th>
+                            </tr>
+                        </thead>
+                        <tbody id="comparisonBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <footer style="text-align: center; color: white; padding: 40px 20px; margin-top: 40px;">
+            <p style="opacity: 0.9;">Made with ❤️ for the AI community</p>
+            <p style="opacity: 0.7; font-size: 14px; margin-top: 10px;">Pricing updated 2026</p>
+        </footer>
+    </div>
+
+    <!-- External Dependencies from CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <!-- Main Application -->
+    <script src="app-v2.js"></script>
+</body>
+
+</html>
