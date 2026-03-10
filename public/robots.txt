@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://jagadeeshpamidi.github.io/free-ai-api-cost-calculator/sitemap.xml
+Sitemap: https://chatslm.com/sitemap.xml
