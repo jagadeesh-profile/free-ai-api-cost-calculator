@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { Calculator as CalcIcon, Plus, Trash2 } from 'lucide-react'
 
 interface CalculationItem {
@@ -9,9 +9,11 @@ interface CalculationItem {
   cost: number
 }
 
+const HISTORY_KEY = 'cost_calc_history'
+
 export default function Calculator() {
   const [items, setItems] = useState<CalculationItem[]>([
-    { id: '1', provider: 'OpenAI GPT-4', tokens: 1000, rate: 0.03, cost: 30 },
+    { id: '1', provider: 'OpenAI GPT-4', tokens: 1000, rate: 0.03, cost: 0.03 },
   ])
   const [newItem, setNewItem] = useState({ provider: '', tokens: 0, rate: 0 })
 
@@ -36,6 +38,24 @@ export default function Calculator() {
 
   const total = items.reduce((sum, item) => sum + item.cost, 0)
 
+  const saveToHistory = () => {
+    const providerBreakdown = items.reduce<Record<string, number>>((acc, item) => {
+      acc[item.provider] = (acc[item.provider] || 0) + item.cost
+      return acc
+    }, {})
+
+    const entry = {
+      timestamp: new Date().toISOString(),
+      total,
+      itemsCount: items.length,
+      providerBreakdown,
+    }
+
+    const raw = localStorage.getItem(HISTORY_KEY)
+    const existing = raw ? (JSON.parse(raw) as typeof entry[]) : []
+    localStorage.setItem(HISTORY_KEY, JSON.stringify([...existing, entry]))
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -51,6 +71,8 @@ export default function Calculator() {
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Provider</label>
             <select
+              title="Provider"
+              aria-label="Provider"
               value={newItem.provider}
               onChange={(e) => setNewItem({ ...newItem, provider: e.target.value })}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
@@ -122,6 +144,8 @@ export default function Calculator() {
                   <td className="py-4 px-4 text-center">
                     <button
                       onClick={() => removeItem(item.id)}
+                      title="Delete item"
+                      aria-label="Delete item"
                       className="text-red-600 hover:text-red-700"
                     >
                       <Trash2 size={18} />
@@ -139,7 +163,15 @@ export default function Calculator() {
             <CalcIcon className="text-blue-600" size={24} />
             <span className="text-lg font-bold text-gray-800">Total Cost:</span>
           </div>
-          <span className="text-3xl font-bold text-blue-600">${total.toFixed(2)}</span>
+          <div className="flex items-center gap-4">
+            <span className="text-3xl font-bold text-blue-600">${total.toFixed(2)}</span>
+            <button
+              onClick={saveToHistory}
+              className="bg-green-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-green-700"
+            >
+              Save Snapshot
+            </button>
+          </div>
         </div>
       </div>
     </div>
