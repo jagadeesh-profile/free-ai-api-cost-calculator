@@ -46,10 +46,10 @@ export const PROVIDER_LABELS: Record<string, string> = {
 }
 
 export const PRESETS = {
-  chatbot: { requests: 1000, inputTokens: 100, outputTokens: 150 },
-  content: { requests: 50, inputTokens: 200, outputTokens: 800 },
-  support: { requests: 500, inputTokens: 300, outputTokens: 200 },
-  code: { requests: 20, inputTokens: 500, outputTokens: 1000 },
+  chat: { multiplier: 1.2, steps: 1, retryFactor: 1.0, toolCallsMultiplier: 1.0 },
+  support: { multiplier: 1.0, steps: 1, retryFactor: 1.0, toolCallsMultiplier: 1.0 },
+  code: { multiplier: 2.5, steps: 2, retryFactor: 1.1, toolCallsMultiplier: 1.0 },
+  agent: { multiplier: 3.0, steps: 5, retryFactor: 1.5, toolCallsMultiplier: 1.2 },
 }
 
 export type CalculationInput = {
@@ -58,6 +58,10 @@ export type CalculationInput = {
   requests: number
   inputTokens: number
   outputTokens: number
+  outputMultiplier?: number
+  stepsPerRequest?: number
+  retryFactor?: number
+  toolCallsMultiplier?: number
   growthRate: number
   discountRate: number
   enterpriseRate: number
@@ -70,6 +74,8 @@ export type CalculationResult = {
   outputCost: number
   total: number
   perRequest: number
+  effectiveRequests: number
+  totalTokensPerRequest: number
   monthly: number
   yearly: number
   projection12Months: { month: string; cost: number }[]
@@ -108,11 +114,18 @@ export function calculateCosts(input: CalculationInput): CalculationResult {
       outputCost: 0,
       total: 0,
       perRequest: 0,
+      effectiveRequests: 0,
+      totalTokensPerRequest: 0,
       monthly: 0,
       yearly: 0,
       projection12Months: [],
     }
   }
+
+  const stepsPerRequest = input.stepsPerRequest ?? 1
+  const retryFactor = input.retryFactor ?? 1
+  const toolCallsMultiplier = input.toolCallsMultiplier ?? 1
+  const effectiveRequests = input.requests * stepsPerRequest * retryFactor * toolCallsMultiplier
 
   let inputPrice = pricing.input
   let outputPrice = pricing.output
@@ -126,8 +139,8 @@ export function calculateCosts(input: CalculationInput): CalculationResult {
     outputPrice *= 0.5
   }
 
-  const totalInputTokens = input.requests * input.inputTokens
-  const totalOutputTokens = input.requests * input.outputTokens
+  const totalInputTokens = effectiveRequests * input.inputTokens
+  const totalOutputTokens = effectiveRequests * input.outputTokens
 
   const rawInputCost = (totalInputTokens / 1000000) * inputPrice
   const rawOutputCost = (totalOutputTokens / 1000000) * outputPrice
@@ -137,6 +150,7 @@ export function calculateCosts(input: CalculationInput): CalculationResult {
   const outputCost = rawOutputCost * reductionMultiplier
   const total = inputCost + outputCost
   const perRequest = input.requests > 0 ? total / input.requests : 0
+  const totalTokensPerRequest = input.inputTokens + input.outputTokens
   const monthly = total * 30
   const yearly = total * 365
 
@@ -154,6 +168,8 @@ export function calculateCosts(input: CalculationInput): CalculationResult {
     outputCost,
     total,
     perRequest,
+    effectiveRequests,
+    totalTokensPerRequest,
     monthly,
     yearly,
     projection12Months,

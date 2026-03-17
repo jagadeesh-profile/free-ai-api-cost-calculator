@@ -7,9 +7,13 @@ export default function Layout() {
   const isActive = (path: string) => location.pathname === path
 
   return (
-    <div className="flex min-h-screen bg-slate-100">
+    <div className="min-h-screen bg-slate-100 md:flex">
+      <header className="md:hidden sticky top-0 z-20 bg-white border-b border-slate-200 px-4 py-3">
+        <h1 className="text-lg font-black text-slate-900 tracking-tight">API Cost Calculator</h1>
+      </header>
+
       {/* Sidebar */}
-      <div className="w-72 bg-white shadow-sm border-r border-slate-200 flex flex-col">
+      <div className="hidden md:flex w-72 bg-white shadow-sm border-r border-slate-200 flex-col">
         <div className="p-6 border-b border-gray-200">
           <h1 className="text-2xl font-black text-slate-900 tracking-tight">API Cost Calculator</h1>
           <p className="text-sm text-slate-600">Static, fast, and provider-agnostic</p>
@@ -54,10 +58,34 @@ export default function Layout() {
 
       {/* Main Content */}
       <div className="flex-1 overflow-auto">
-        <div className="p-8">
+        <div className="p-4 md:p-8 pb-24 md:pb-8">
           <Outlet />
         </div>
       </div>
+
+      <nav className="md:hidden fixed bottom-0 inset-x-0 z-30 bg-white border-t border-slate-200 grid grid-cols-3">
+        <Link
+          to="/"
+          className={`flex flex-col items-center justify-center py-2 text-xs ${isActive('/') ? 'text-slate-900' : 'text-slate-500'}`}
+        >
+          <Home size={18} />
+          Dashboard
+        </Link>
+        <Link
+          to="/calculator"
+          className={`flex flex-col items-center justify-center py-2 text-xs ${isActive('/calculator') ? 'text-slate-900' : 'text-slate-500'}`}
+        >
+          <Calculator size={18} />
+          Calculator
+        </Link>
+        <Link
+          to="/settings"
+          className={`flex flex-col items-center justify-center py-2 text-xs ${isActive('/settings') ? 'text-slate-900' : 'text-slate-500'}`}
+        >
+          <Settings size={18} />
+          Settings
+        </Link>
+      </nav>
     </div>
   )
 }

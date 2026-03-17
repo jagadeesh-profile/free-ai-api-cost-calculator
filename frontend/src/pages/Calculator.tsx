@@ -34,11 +34,14 @@ export default function Calculator() {
 
   const [mode, setMode] = useState<InputMode>('text')
   const [inputText, setInputText] = useState('')
-  const [outputTokenRatio, setOutputTokenRatio] = useState(1.25)
+  const [outputMultiplier, setOutputMultiplier] = useState(1.2)
 
   const [requests, setRequests] = useState(1000)
   const [manualInputTokens, setManualInputTokens] = useState(200)
   const [manualOutputTokens, setManualOutputTokens] = useState(300)
+  const [stepsPerRequest, setStepsPerRequest] = useState(1)
+  const [retryFactor, setRetryFactor] = useState(1)
+  const [toolCallsMultiplier, setToolCallsMultiplier] = useState(1)
 
   const [growthRate, setGrowthRate] = useState(10)
   const [discountRate, setDiscountRate] = useState(0)
@@ -47,7 +50,7 @@ export default function Calculator() {
   const [useBatch, setUseBatch] = useState(false)
 
   const inputTokens = mode === 'text' ? estimateTokensFromText(inputText) : manualInputTokens
-  const outputTokens = mode === 'text' ? Math.ceil(inputTokens * outputTokenRatio) : manualOutputTokens
+  const outputTokens = mode === 'text' ? Math.ceil(inputTokens * outputMultiplier) : manualOutputTokens
 
   const calculationInput: CalculationInput = {
     provider,
@@ -55,6 +58,10 @@ export default function Calculator() {
     requests,
     inputTokens,
     outputTokens,
+    outputMultiplier,
+    stepsPerRequest,
+    retryFactor,
+    toolCallsMultiplier,
     growthRate,
     discountRate,
     enterpriseRate,
@@ -70,6 +77,10 @@ export default function Calculator() {
       requests,
       inputTokens,
       outputTokens,
+      outputMultiplier,
+      stepsPerRequest,
+      retryFactor,
+      toolCallsMultiplier,
       growthRate,
       discountRate,
       enterpriseRate,
@@ -103,9 +114,10 @@ export default function Calculator() {
 
   const applyPreset = (preset: keyof typeof PRESETS) => {
     const p = PRESETS[preset]
-    setRequests(p.requests)
-    setManualInputTokens(p.inputTokens)
-    setManualOutputTokens(p.outputTokens)
+    setOutputMultiplier(p.multiplier)
+    setStepsPerRequest(p.steps)
+    setRetryFactor(p.retryFactor)
+    setToolCallsMultiplier(p.toolCallsMultiplier)
   }
 
   const saveSnapshot = () => {
@@ -131,7 +143,7 @@ export default function Calculator() {
   return (
     <div className="space-y-8">
       <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-        <h1 className="text-4xl font-black tracking-tight text-slate-900">API Cost Calculator</h1>
+        <h1 className="text-3xl md:text-4xl font-black tracking-tight text-slate-900">API Cost Calculator</h1>
         <p className="text-slate-600 mt-2 text-base">Compare OpenAI, Claude, Gemini and more with text or token input.</p>
       </div>
 
@@ -211,16 +223,16 @@ export default function Calculator() {
                   </div>
                 </div>
                 <div>
-                  <label className="text-sm font-semibold text-slate-700">Output Token Ratio ({outputTokenRatio.toFixed(2)}x)</label>
+                  <label className="text-sm font-semibold text-slate-700">Estimated Output Multiplier ({outputMultiplier.toFixed(2)}x)</label>
                   <input
                     type="range"
-                    title="Output token ratio"
-                    aria-label="Output token ratio"
+                    title="Estimated output multiplier"
+                    aria-label="Estimated output multiplier"
                     min={0.5}
-                    max={2.5}
+                    max={4}
                     step={0.05}
-                    value={outputTokenRatio}
-                    onChange={(e) => setOutputTokenRatio(Number(e.target.value))}
+                    value={outputMultiplier}
+                    onChange={(e) => setOutputMultiplier(Number(e.target.value))}
                     className="w-full"
                   />
                 </div>
@@ -306,11 +318,8 @@ export default function Calculator() {
             </div>
 
             <div className="flex flex-wrap gap-2">
-              <button onClick={() => applyPreset('chatbot')} className="px-3 py-2 rounded-lg bg-slate-100 text-slate-800 text-sm">
-                Chatbot Preset
-              </button>
-              <button onClick={() => applyPreset('content')} className="px-3 py-2 rounded-lg bg-slate-100 text-slate-800 text-sm">
-                Content Preset
+              <button onClick={() => applyPreset('chat')} className="px-3 py-2 rounded-lg bg-slate-100 text-slate-800 text-sm">
+                Chat Preset
               </button>
               <button onClick={() => applyPreset('support')} className="px-3 py-2 rounded-lg bg-slate-100 text-slate-800 text-sm">
                 Support Preset
@@ -318,6 +327,50 @@ export default function Calculator() {
               <button onClick={() => applyPreset('code')} className="px-3 py-2 rounded-lg bg-slate-100 text-slate-800 text-sm">
                 Code Preset
               </button>
+              <button onClick={() => applyPreset('agent')} className="px-3 py-2 rounded-lg bg-slate-100 text-slate-800 text-sm">
+                Agent Preset
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label className="text-sm font-semibold text-slate-700">Steps per Request</label>
+                <input
+                  type="number"
+                  min={1}
+                  title="Steps per request"
+                  placeholder="1"
+                  value={stepsPerRequest}
+                  onChange={(e) => setStepsPerRequest(Number(e.target.value))}
+                  className="w-full mt-2 border border-slate-300 rounded-xl px-4 py-3"
+                />
+              </div>
+              <div>
+                <label className="text-sm font-semibold text-slate-700">Retry Factor</label>
+                <input
+                  type="number"
+                  min={1}
+                  step={0.1}
+                  title="Retry factor"
+                  placeholder="1.0"
+                  value={retryFactor}
+                  onChange={(e) => setRetryFactor(Number(e.target.value))}
+                  className="w-full mt-2 border border-slate-300 rounded-xl px-4 py-3"
+                />
+              </div>
+              <div>
+                <label className="text-sm font-semibold text-slate-700">Tool Calls Multiplier</label>
+                <input
+                  type="number"
+                  min={1}
+                  step={0.1}
+                  title="Tool calls multiplier"
+                  placeholder="1.0"
+                  value={toolCallsMultiplier}
+                  onChange={(e) => setToolCallsMultiplier(Number(e.target.value))}
+                  className="w-full mt-2 border border-slate-300 rounded-xl px-4 py-3"
+                />
+              </div>
             </div>
 
             <div className="flex gap-6 text-sm font-medium text-slate-700">
@@ -343,6 +396,12 @@ export default function Calculator() {
             <div className="bg-white rounded-2xl p-5 border border-slate-200">
               <p className="text-sm text-slate-500">Yearly Projection</p>
               <p className="text-3xl font-black text-slate-900 mt-2">${result.yearly.toFixed(2)}</p>
+            </div>
+            <div className="bg-white rounded-2xl p-5 border border-slate-200 md:col-span-3">
+              <p className="text-sm text-slate-500">Effective Requests and Tokens</p>
+              <p className="text-lg font-bold text-slate-900 mt-2">
+                {Math.round(result.effectiveRequests).toLocaleString()} effective requests | {result.totalTokensPerRequest.toLocaleString()} tokens per request
+              </p>
             </div>
           </div>
         </div>
@@ -392,6 +451,7 @@ export default function Calculator() {
               <li>
                 Input cost: ${result.inputCost.toFixed(2)} | Output cost: ${result.outputCost.toFixed(2)}
               </li>
+              <li>Effective requests after agent controls: {Math.round(result.effectiveRequests).toLocaleString()}</li>
               <li>{useCache ? 'Caching enabled.' : 'Enable caching if model supports it for lower prompt costs.'}</li>
               <li>{useBatch ? 'Batch mode enabled.' : 'Enable batch mode for asynchronous workloads to reduce cost.'}</li>
             </ul>
