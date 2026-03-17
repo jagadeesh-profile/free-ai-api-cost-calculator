@@ -131,7 +131,7 @@ export default function Calculator() {
   return (
     <div className="space-y-8">
       <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-        <h1 className="text-4xl font-black tracking-tight text-slate-900">Free API Cost Calculator</h1>
+        <h1 className="text-4xl font-black tracking-tight text-slate-900">API Cost Calculator</h1>
         <p className="text-slate-600 mt-2 text-base">Compare OpenAI, Claude, Gemini and more with text or token input.</p>
       </div>
 
@@ -199,7 +199,7 @@ export default function Calculator() {
                   value={inputText}
                   onChange={(e) => setInputText(e.target.value)}
                   rows={6}
-                  placeholder="Paste any text: 10 words, 100 words, 200 words..."
+                  placeholder="Enter your text"
                   className="w-full border border-slate-300 rounded-xl px-4 py-3"
                 />
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">

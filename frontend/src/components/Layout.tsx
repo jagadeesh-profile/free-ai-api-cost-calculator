@@ -11,7 +11,7 @@ export default function Layout() {
       {/* Sidebar */}
       <div className="w-72 bg-white shadow-sm border-r border-slate-200 flex flex-col">
         <div className="p-6 border-b border-gray-200">
-          <h1 className="text-2xl font-black text-slate-900 tracking-tight">Free API Cost Calculator</h1>
+          <h1 className="text-2xl font-black text-slate-900 tracking-tight">API Cost Calculator</h1>
           <p className="text-sm text-slate-600">Static, fast, and provider-agnostic</p>
         </div>
 
