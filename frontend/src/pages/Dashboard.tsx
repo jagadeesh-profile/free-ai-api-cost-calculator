@@ -1,14 +1,16 @@
-import { useState } from 'react'
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
-
-type HistoryEntry = {
-  timestamp: string
-  total: number
-  itemsCount: number
-  providerBreakdown: Record<string, number>
-}
-
-const HISTORY_KEY = 'cost_calc_history'
+import { useMemo } from 'react'
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Line,
+  LineChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from 'recharts'
+import { HISTORY_KEY, PROVIDER_LABELS, type HistoryEntry } from '../lib/pricing'
 
 const readHistory = (): HistoryEntry[] => {
   try {
@@ -21,134 +23,118 @@ const readHistory = (): HistoryEntry[] => {
 }
 
 export default function Dashboard() {
-  const [history] = useState<HistoryEntry[]>(readHistory())
+  const history = readHistory()
 
-  const totalCost = history.reduce((sum, entry) => sum + entry.total, 0)
-  const totalCalculations = history.length
-  const avgCost = totalCalculations > 0 ? totalCost / totalCalculations : 0
+  const summary = useMemo(() => {
+    const totalCost = history.reduce((sum, entry) => sum + entry.total, 0)
+    const avgCost = history.length > 0 ? totalCost / history.length : 0
 
-  const providerTotals = history.reduce<Record<string, number>>((acc, entry) => {
-    Object.entries(entry.providerBreakdown).forEach(([provider, cost]) => {
-      acc[provider] = (acc[provider] || 0) + cost
-    })
-    return acc
-  }, {})
+    const providerTotals = history.reduce<Record<string, number>>((acc, entry) => {
+      acc[entry.provider] = (acc[entry.provider] || 0) + entry.total
+      return acc
+    }, {})
 
-  const topProviders = Object.entries(providerTotals)
-    .map(([provider, cost]) => ({ provider, totalCost: cost }))
-    .sort((a, b) => b.totalCost - a.totalCost)
-    .slice(0, 5)
-    .map((provider) => ({
-      ...provider,
-      percentage: totalCost > 0 ? (provider.totalCost / totalCost) * 100 : 0,
+    const providerBreakdown = Object.entries(providerTotals)
+      .map(([provider, total]) => ({
+        provider: PROVIDER_LABELS[provider] || provider,
+        total,
+      }))
+      .sort((a, b) => b.total - a.total)
+
+    const latestProjection = history.length > 0 ? history[history.length - 1].projection12Months : []
+
+    const recent = [...history].slice(-10).map((entry) => ({
+      time: new Date(entry.timestamp).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+      total: entry.total,
     }))
 
-  const dailyMap: Record<string, number> = {}
-  history.forEach((entry) => {
-    const date = new Date(entry.timestamp).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
-    dailyMap[date] = (dailyMap[date] || 0) + entry.total
-  })
-  const dailyCosts = Object.entries(dailyMap).map(([date, cost]) => ({ date, cost }))
-
-  const providerChartData = dailyCosts.length > 0 ? dailyCosts : [
-    { date: 'No Data', cost: 0 }
-  ]
+    return {
+      totalCost,
+      avgCost,
+      providerBreakdown,
+      latestProjection,
+      recent,
+      snapshots: history.length,
+      topModel: history.length > 0 ? history[history.length - 1].model : 'N/A',
+    }
+  }, [history])
 
   return (
     <div className="space-y-8">
-      {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold text-gray-800">Dashboard</h1>
-        <p className="text-gray-600">Local analytics overview (GitHub Pages compatible)</p>
+      <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+        <h1 className="text-4xl font-black tracking-tight text-slate-900">Free API Cost Calculator</h1>
+        <p className="text-slate-600 mt-2">Cost analytics, provider breakdown, and forecast insights.</p>
       </div>
 
-      {/* KPI Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-white p-6 rounded-lg shadow">
-          <p className="text-sm text-gray-600 font-medium">Total Cost</p>
-          <p className="text-3xl font-bold text-gray-800 mt-2">
-            ${totalCost.toFixed(2)}
-          </p>
-          <p className="text-xs text-gray-600 mt-2">Current period</p>
+        <div className="bg-white p-5 rounded-xl border border-slate-200">
+          <p className="text-sm text-slate-500">Total Cost</p>
+          <p className="text-3xl font-black text-slate-900 mt-2">${summary.totalCost.toFixed(2)}</p>
         </div>
-
-        <div className="bg-white p-6 rounded-lg shadow">
-          <p className="text-sm text-gray-600 font-medium">Calculations</p>
-          <p className="text-3xl font-bold text-gray-800 mt-2">
-            {totalCalculations}
-          </p>
-          <p className="text-xs text-gray-600 mt-2">Total in period</p>
+        <div className="bg-white p-5 rounded-xl border border-slate-200">
+          <p className="text-sm text-slate-500">Snapshots</p>
+          <p className="text-3xl font-black text-slate-900 mt-2">{summary.snapshots}</p>
         </div>
-
-        <div className="bg-white p-6 rounded-lg shadow">
-          <p className="text-sm text-gray-600 font-medium">Average Cost</p>
-          <p className="text-3xl font-bold text-gray-800 mt-2">
-            ${avgCost.toFixed(2)}
-          </p>
-          <p className="text-xs text-gray-600 mt-2">Per calculation</p>
+        <div className="bg-white p-5 rounded-xl border border-slate-200">
+          <p className="text-sm text-slate-500">Average Cost</p>
+          <p className="text-3xl font-black text-slate-900 mt-2">${summary.avgCost.toFixed(2)}</p>
         </div>
-
-        <div className="bg-white p-6 rounded-lg shadow">
-          <p className="text-sm text-gray-600 font-medium">Top Provider</p>
-          <p className="text-3xl font-bold text-gray-800 mt-2">
-            {topProviders[0]?.provider || 'N/A'}
-          </p>
-          <p className="text-xs text-gray-600 mt-2">
-            ${topProviders[0]?.totalCost?.toFixed(2) || '0.00'}
-          </p>
+        <div className="bg-white p-5 rounded-xl border border-slate-200">
+          <p className="text-sm text-slate-500">Last Model</p>
+          <p className="text-xl font-black text-slate-900 mt-2">{summary.topModel}</p>
         </div>
       </div>
 
-      {/* Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white p-6 rounded-lg shadow">
-          <h2 className="text-lg font-bold text-gray-800 mb-4">Daily Cost Trend</h2>
-          {providerChartData.length > 0 && providerChartData[0].date !== 'No Data' ? (
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={providerChartData}>
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+        <div className="bg-white p-6 rounded-2xl border border-slate-200">
+          <h2 className="text-xl font-black text-slate-900 mb-4">Recent Snapshot Trend</h2>
+          <div className="h-72">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={summary.recent}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="date" />
+                <XAxis dataKey="time" />
                 <YAxis />
-                <Tooltip />
-                <Legend />
-                <Line type="monotone" dataKey="cost" stroke="#3b82f6" name="Cost ($)" />
+                <Tooltip formatter={(value: number) => `$${value.toFixed(2)}`} />
+                <Line type="monotone" dataKey="total" stroke="#0f172a" strokeWidth={3} />
               </LineChart>
             </ResponsiveContainer>
-          ) : (
-            <div className="h-80 flex items-center justify-center bg-gray-50 rounded">
-              <p className="text-gray-500">No analytics data available</p>
-            </div>
-          )}
+          </div>
         </div>
 
-        {/* Top Providers */}
-        <div className="bg-white p-6 rounded-lg shadow">
-          <h2 className="text-lg font-bold text-gray-800 mb-4">Top Providers</h2>
-          {topProviders.length > 0 ? (
-            <div className="space-y-3">
-              {topProviders.map((provider) => (
-                <div key={provider.provider} className="flex justify-between items-center">
-                  <div>
-                    <p className="font-medium text-gray-800">{provider.provider}</p>
-                    <p className="text-xs text-gray-600">${provider.totalCost?.toFixed(2)}</p>
-                  </div>
-                  <p className="text-sm text-gray-700 w-12 text-right">{provider.percentage.toFixed(1)}%</p>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="h-40 flex items-center justify-center bg-gray-50 rounded">
-              <p className="text-gray-500">No provider data</p>
-            </div>
-          )}
+        <div className="bg-white p-6 rounded-2xl border border-slate-200">
+          <h2 className="text-xl font-black text-slate-900 mb-4">Provider Cost Breakdown</h2>
+          <div className="h-72">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={summary.providerBreakdown}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="provider" />
+                <YAxis />
+                <Tooltip formatter={(value: number) => `$${value.toFixed(2)}`} />
+                <Bar dataKey="total" fill="#2563eb" />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
         </div>
       </div>
 
-      {/* Empty State */}
+      <div className="bg-white p-6 rounded-2xl border border-slate-200">
+        <h2 className="text-xl font-black text-slate-900 mb-4">12-Month Forecast from Latest Snapshot</h2>
+        <div className="h-72">
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={summary.latestProjection}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="month" />
+              <YAxis />
+              <Tooltip formatter={(value: number) => `$${value.toFixed(2)}`} />
+              <Line type="monotone" dataKey="cost" stroke="#0f766e" strokeWidth={3} />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+
       {history.length === 0 && (
-        <div className="bg-blue-50 border-l-4 border-blue-600 p-4 rounded">
-          <h3 className="font-bold text-blue-800">No Calculations Yet</h3>
-          <p className="text-blue-700 mt-1">Go to Calculator and save a calculation to see analytics here.</p>
+        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-amber-800">
+          No snapshots yet. Open Calculator, run a scenario, and click Save Snapshot to populate analytics.
         </div>
       )}
     </div>
