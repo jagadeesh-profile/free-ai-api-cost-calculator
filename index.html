@@ -10,6 +10,39 @@
   </head>
   <body>
     <div id="root"></div>
-      <a href=""/instantdeploy/"" style=""position:fixed;right:16px;bottom:16px;z-index:9999;background:#0f766e;color:#fff;padding:10px 14px;border-radius:999px;text-decoration:none;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;font-size:14px;box-shadow:0 8px 20px rgba(0,0,0,.2);"">InstantDeploy</a></body>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        // Inject InstantDeploy link into the navigation after app loads
+        const maxRetries = 50;
+        let retries = 0;
+        const injectLink = setInterval(() => {
+          // Look for the Additional Links section or navigation
+          const links = document.querySelectorAll('a');
+          let found = false;
+          for (let link of links) {
+            if (link.textContent.includes('Calculator') || link.textContent.includes('Settings')) {
+              // Found navigation area
+              const parent = link.parentElement;
+              if (parent && !parent.querySelector('a[href="/instantdeploy/"]')) {
+                const newLink = document.createElement('a');
+                newLink.href = '/instantdeploy/';
+                newLink.textContent = 'InstantDeploy';
+                newLink.style.display = 'block';
+                newLink.style.margin = '8px 0';
+                newLink.style.color = 'inherit';
+                newLink.style.textDecoration = 'none';
+                parent.appendChild(newLink);
+                found = true;
+                break;
+              }
+            }
+          }
+          if (found || retries++ > maxRetries) {
+            clearInterval(injectLink);
+          }
+        }, 100);
+      });
+    </script>
+  </body>
 </html>
 
