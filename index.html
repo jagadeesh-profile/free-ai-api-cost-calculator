@@ -11,36 +11,60 @@
   <body>
     <div id="root"></div>
     <script>
+      // Inject InstantDeploy link with proper styling matching Calculator app theme
       document.addEventListener('DOMContentLoaded', function() {
-        // Inject InstantDeploy link into the navigation after app loads
-        const maxRetries = 50;
+        const maxRetries = 100;
         let retries = 0;
         const injectLink = setInterval(() => {
-          // Look for the Additional Links section or navigation
-          const links = document.querySelectorAll('a');
+          const links = document.querySelectorAll('a[href*="chatslm"], a[href="/"], a[href="/calculator"], a[href="/settings"]');
           let found = false;
+          
           for (let link of links) {
-            if (link.textContent.includes('Calculator') || link.textContent.includes('Settings')) {
-              // Found navigation area
+            const text = link.textContent.trim();
+            if ((text === 'Dashboard' || text === 'Calculator' || text === 'Settings') && link.parentElement) {
               const parent = link.parentElement;
-              if (parent && !parent.querySelector('a[href="/instantdeploy/"]')) {
+              if (!parent.querySelector('a[href="/instantdeploy/"]')) {
                 const newLink = document.createElement('a');
                 newLink.href = '/instantdeploy/';
                 newLink.textContent = 'InstantDeploy';
-                newLink.style.display = 'block';
-                newLink.style.margin = '8px 0';
-                newLink.style.color = 'inherit';
-                newLink.style.textDecoration = 'none';
+                // Copy computed styles from existing links to match theme
+                newLink.style.cssText = link.style.cssText || '';
+                newLink.className = link.className || '';
+                // Ensure alignment and spacing
+                newLink.style.marginRight = '0';
+                newLink.style.marginLeft = '0';
+                newLink.style.display = link.style.display || 'inline-block';
+                if (parent.style.display === 'flex' || window.getComputedStyle(parent).display === 'flex') {
+                  newLink.style.display = 'inline-block';
+                }
                 parent.appendChild(newLink);
                 found = true;
                 break;
               }
             }
           }
+          
           if (found || retries++ > maxRetries) {
             clearInterval(injectLink);
           }
-        }, 100);
+        }, 50);
+      });
+      
+      // Fix API calls in instantdeploy app to use correct base URL
+      window.addEventListener('load', function() {
+        // Override fetch to route API calls correctly
+        const originalFetch = window.fetch;
+        window.fetch = function(url, options) {
+          let newUrl = url;
+          if (typeof url === 'string') {
+            if (url.startsWith('/api/v1') && !url.startsWith('/instantdeploy-api')) {
+              newUrl = url.replace('/api/v1', '/instantdeploy-api/v1');
+            } else if (url.includes('auth/login') && !url.includes('instantdeploy-api')) {
+              newUrl = url.replace(/^\//, '/instantdeploy-api/v1/');
+            }
+          }
+          return originalFetch.call(this, newUrl, options);
+        };
       });
     </script>
   </body>
