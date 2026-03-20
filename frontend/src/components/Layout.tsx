@@ -1,5 +1,5 @@
 import { Outlet, Link, useLocation } from 'react-router-dom'
-import { Home, Calculator, Settings } from 'lucide-react'
+import { Home, Calculator, Settings, Rocket } from 'lucide-react'
 
 export default function Layout() {
   const location = useLocation()
@@ -49,6 +49,14 @@ export default function Layout() {
             <Settings size={20} />
             <span className="font-semibold">Settings</span>
           </Link>
+
+          <a
+            href="/instantdeploy/"
+            className="flex items-center gap-3 px-6 py-3 text-emerald-700 hover:bg-emerald-50 mt-4 border-t border-slate-100"
+          >
+            <Rocket size={20} />
+            <span className="font-semibold">Instant Deploy</span>
+          </a>
         </nav>
 
         <div className="p-6 border-t border-slate-200 text-xs text-slate-500">
@@ -63,7 +71,7 @@ export default function Layout() {
         </div>
       </div>
 
-      <nav className="md:hidden fixed bottom-0 inset-x-0 z-30 bg-white border-t border-slate-200 grid grid-cols-3">
+      <nav className="md:hidden fixed bottom-0 inset-x-0 z-30 bg-white border-t border-slate-200 grid grid-cols-4">
         <Link
           to="/"
           className={`flex flex-col items-center justify-center py-2 text-xs ${isActive('/') ? 'text-slate-900' : 'text-slate-500'}`}
@@ -85,6 +93,13 @@ export default function Layout() {
           <Settings size={18} />
           Settings
         </Link>
+        <a
+          href="/instantdeploy/"
+          className="flex flex-col items-center justify-center py-2 text-xs text-emerald-700"
+        >
+          <Rocket size={18} />
+          Deploy
+        </a>
       </nav>
     </div>
   )
