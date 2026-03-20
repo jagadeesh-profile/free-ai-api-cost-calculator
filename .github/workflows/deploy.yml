@@ -37,6 +37,9 @@ jobs:
           echo chatslm.com > dist/CNAME
           touch dist/.nojekyll
 
+      - name: Inject InstantDeploy Application Module
+        run: cp -r instantdeploy ./frontend/dist/instantdeploy
+
       - name: Deploy to gh-pages branch
         uses: peaceiris/actions-gh-pages@v4
         with:
