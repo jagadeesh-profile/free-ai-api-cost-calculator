@@ -2,7 +2,7 @@
 
 A free, open-source tool to calculate and compare AI API costs across 10+ providers — including OpenAI GPT-5, Anthropic Claude 4, Google Gemini 3, xAI Grok-2, Meta Llama, Mistral, Cohere, and more.
 
-🌐 **Live App**: https://jagadeeshpamidi.github.io/free-ai-api-cost-calculator/
+🌐 **Live App**: https://chatslm.com/
 
 ## Features
 

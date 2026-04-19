@@ -34,7 +34,6 @@ jobs:
         working-directory: ./frontend
         run: |
           cp dist/index.html dist/404.html
-          echo chatslm.com > dist/CNAME
           touch dist/.nojekyll
 
       - name: Inject InstantDeploy Application Module
