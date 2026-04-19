@@ -143,8 +143,8 @@ export default function Calculator() {
   return (
     <div className="space-y-8">
       <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-        <h1 className="text-3xl md:text-4xl font-black tracking-tight text-slate-900">API Cost Calculator</h1>
-        <p className="text-slate-600 mt-2 text-base">Compare OpenAI, Claude, Gemini and more with text or token input.</p>
+        <h1 className="text-3xl md:text-4xl font-black tracking-tight text-slate-900">ChatSLM Cost Calculator</h1>
+        <p className="text-slate-600 mt-2 text-base">Compare OpenAI, Claude, Gemini, xAI, and more using realistic token and request settings.</p>
       </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">

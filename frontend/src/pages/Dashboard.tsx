@@ -62,8 +62,8 @@ export default function Dashboard() {
   return (
     <div className="space-y-8">
       <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-        <h1 className="text-4xl font-black tracking-tight text-slate-900">API Cost Calculator</h1>
-        <p className="text-slate-600 mt-2">Cost analytics, provider breakdown, and forecast insights.</p>
+        <h1 className="text-4xl font-black tracking-tight text-slate-900">ChatSLM Dashboard</h1>
+        <p className="text-slate-600 mt-2">Cost analytics, provider breakdown, and forecast insights for AI API usage.</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">

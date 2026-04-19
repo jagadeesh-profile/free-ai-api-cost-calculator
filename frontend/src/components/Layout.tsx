@@ -9,14 +9,14 @@ export default function Layout() {
   return (
     <div className="min-h-screen bg-slate-100 md:flex">
       <header className="md:hidden sticky top-0 z-20 bg-white border-b border-slate-200 px-4 py-3">
-        <h1 className="text-lg font-black text-slate-900 tracking-tight">API Cost Calculator</h1>
+        <h1 className="text-lg font-black text-slate-900 tracking-tight">ChatSLM Cost Calculator</h1>
       </header>
 
       {/* Sidebar */}
       <div className="hidden md:flex w-72 bg-white shadow-sm border-r border-slate-200 flex-col">
         <div className="p-6 border-b border-gray-200">
-          <h1 className="text-2xl font-black text-slate-900 tracking-tight">API Cost Calculator</h1>
-          <p className="text-sm text-slate-600">Static, fast, and provider-agnostic</p>
+          <h1 className="text-2xl font-black text-slate-900 tracking-tight">ChatSLM</h1>
+          <p className="text-sm text-slate-600">Free AI API cost calculator for 2026 models</p>
         </div>
 
         <nav className="mt-6 flex-1">
